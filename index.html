@@ -249,41 +249,89 @@
     </div>
 
     <script>
-        // API endpoints (will create serverless functions)
-        const API_URL = window.location.origin; // Same origin for Vercel
-        
-        // Generate a key for a user
-        async function generateKeyForUser(userId) {
-            try {
-                const response = await fetch(`${API_URL}/api/generate-key`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId: userId.toString() })
-                });
-                
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Error generating key:', error);
-                return { error: 'Failed to generate key' };
+        // Generate a hash for the key
+        function generateHash(userId, timestamp) {
+            // Simple deterministic hash
+            let hash = 0;
+            const str = `${userId}-${timestamp}-ROBLOX-KEY-SECRET`;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
             }
+            return Math.abs(hash).toString(16).substring(0, 8).toUpperCase();
         }
-        
+
+        // Generate timestamp (10-minute blocks)
+        function getTimestamp() {
+            const now = Date.now();
+            const tenMinuteBlock = Math.floor(now / (10 * 60 * 1000));
+            return tenMinuteBlock.toString(36).toUpperCase();
+        }
+
+        // Generate key for user
+        function generateKey(userId) {
+            const timestamp = getTimestamp();
+            const hash = generateHash(userId, timestamp);
+            return `${userId}-${timestamp}-${hash}`;
+        }
+
+        // Check if a key is still valid
+        function isKeyValid(keyData) {
+            if (!keyData) return false;
+            
+            const now = Date.now();
+            const timeLeft = keyData.expiresAt - now;
+            
+            // Also check if the 10-minute block is still the same
+            const currentTimestamp = getTimestamp();
+            const keyTimestamp = keyData.key.split('-')[1];
+            
+            return timeLeft > 0 && currentTimestamp === keyTimestamp;
+        }
+
+        // Save key to localStorage
+        function saveKeyToStorage(userId, key) {
+            const keyData = {
+                key: key,
+                generatedAt: Date.now(),
+                expiresAt: Date.now() + (10 * 60 * 1000), // 10 minutes
+                userId: userId
+            };
+            
+            // Store in localStorage
+            localStorage.setItem(`roblox_key_${userId}`, JSON.stringify(keyData));
+            
+            // Also store recent keys for lookup
+            let recentKeys = JSON.parse(localStorage.getItem('recent_keys') || '[]');
+            recentKeys = recentKeys.filter(k => k.userId !== userId);
+            recentKeys.push(keyData);
+            localStorage.setItem('recent_keys', JSON.stringify(recentKeys.slice(-10))); // Keep last 10
+        }
+
+        // Get key from storage
+        function getKeyFromStorage(userId) {
+            const keyData = JSON.parse(localStorage.getItem(`roblox_key_${userId}`) || 'null');
+            
+            if (keyData && isKeyValid(keyData)) {
+                return keyData;
+            }
+            
+            return null;
+        }
+
         // Format time as MM:SS
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
-        
+
         // Update timer display
-        function startTimer(keyTimestamp) {
-            const keyTime = new Date(keyTimestamp);
+        function startTimer(expiresAt) {
             const updateTimerDisplay = () => {
-                const now = new Date();
-                const timeLeft = 10 * 60 * 1000 - (now - keyTime); // 10 minutes in ms
+                const now = Date.now();
+                const timeLeft = expiresAt - now;
                 
                 if (timeLeft <= 0) {
                     document.getElementById('timer').textContent = 'EXPIRED - Generate a new key';
@@ -296,9 +344,12 @@
             };
             
             updateTimerDisplay();
-            setInterval(updateTimerDisplay, 1000);
+            const timerInterval = setInterval(updateTimerDisplay, 1000);
+            
+            // Return function to stop timer
+            return () => clearInterval(timerInterval);
         }
-        
+
         // Copy key to clipboard
         function copyToClipboard() {
             const key = document.getElementById('generatedKey').textContent;
@@ -313,7 +364,7 @@
                 copyFallback(key);
             }
         }
-        
+
         // Fallback copy method
         function copyFallback(text) {
             const textArea = document.createElement('textarea');
@@ -331,7 +382,7 @@
             
             document.body.removeChild(textArea);
         }
-        
+
         // Show status message
         function showStatus(message, type) {
             const statusEl = document.getElementById('statusMessage');
@@ -342,13 +393,39 @@
                 statusEl.className = 'status';
             }, 3000);
         }
-        
+
+        // Add key to HTML for Roblox script to parse
+        function addKeyForParsing(key) {
+            // Remove any existing key elements
+            const oldMeta = document.querySelector('meta[name="generated-key"]');
+            if (oldMeta) oldMeta.remove();
+            
+            const oldDiv = document.getElementById('key-plain-text');
+            if (oldDiv) oldDiv.remove();
+            
+            // Add meta tag
+            const metaTag = document.createElement('meta');
+            metaTag.name = 'generated-key';
+            metaTag.content = key;
+            document.head.appendChild(metaTag);
+            
+            // Add hidden div with JUST the key (no spaces, no formatting)
+            const plainDiv = document.createElement('div');
+            plainDiv.id = 'key-plain-text';
+            plainDiv.style.display = 'none';
+            plainDiv.textContent = key;
+            document.body.appendChild(plainDiv);
+            
+            console.log('Key added for Roblox parsing:', key);
+        }
+
         // Initialize the page
         function init() {
             const generateBtn = document.getElementById('generateBtn');
             const userIdInput = document.getElementById('userIdInput');
             const copyBtn = document.getElementById('copyBtn');
             const keyDisplay = document.getElementById('keyDisplay');
+            let stopTimer = null;
             
             // Generate button click
             generateBtn.addEventListener('click', async () => {
@@ -364,42 +441,47 @@
                 generateBtn.textContent = '🔄 Generating...';
                 
                 try {
-                    // Call API to generate key
-                    const result = await generateKeyForUser(userId);
+                    // Check if user already has a valid key
+                    const existingKeyData = getKeyFromStorage(userId);
                     
-                    if (result.error) {
-                        showStatus(`❌ Error: ${result.error}`, 'error');
-                        generateBtn.disabled = false;
-                        generateBtn.textContent = '🔑 Generate My Key';
-                        return;
+                    let keyData;
+                    if (existingKeyData) {
+                        // Use existing valid key
+                        keyData = existingKeyData;
+                        showStatus('✅ Using existing valid key', 'success');
+                    } else {
+                        // Generate new key
+                        const key = generateKey(userId);
+                        keyData = {
+                            key: key,
+                            generatedAt: Date.now(),
+                            expiresAt: Date.now() + (10 * 60 * 1000),
+                            userId: userId
+                        };
+                        
+                        // Save to storage
+                        saveKeyToStorage(userId, key);
+                        showStatus('✅ New key generated successfully!', 'success');
                     }
                     
                     // Display the key
-                    document.getElementById('generatedKey').textContent = result.key;
+                    document.getElementById('generatedKey').textContent = keyData.key;
                     keyDisplay.style.display = 'block';
                     
+                    // Clear any existing timer
+                    if (stopTimer) stopTimer();
+                    
                     // Start the timer
-                    startTimer(result.generatedAt);
+                    stopTimer = startTimer(keyData.expiresAt);
                     
                     // Store user ID in localStorage for convenience
                     localStorage.setItem('roblox_userid', userId);
                     
-                    showStatus('✅ Key generated successfully!', 'success');
-                    
-                    // Add meta tag for Roblox script to read
-                    const metaTag = document.createElement('meta');
-                    metaTag.name = 'generated-key';
-                    metaTag.content = result.key;
-                    document.head.appendChild(metaTag);
-                    
-                    // Also add plain text for parsing
-                    const plainText = document.createElement('div');
-                    plainText.id = 'key-plain-text';
-                    plainText.style.display = 'none';
-                    plainText.textContent = result.key;
-                    document.body.appendChild(plainText);
+                    // Add key for Roblox script parsing
+                    addKeyForParsing(keyData.key);
                     
                 } catch (error) {
+                    console.error('Error:', error);
                     showStatus('❌ Failed to generate key. Please try again.', 'error');
                 } finally {
                     generateBtn.disabled = false;
@@ -414,6 +496,19 @@
             const savedUserId = localStorage.getItem('roblox_userid');
             if (savedUserId) {
                 userIdInput.value = savedUserId;
+                
+                // Auto-load existing key if available
+                const existingKeyData = getKeyFromStorage(savedUserId);
+                if (existingKeyData) {
+                    document.getElementById('generatedKey').textContent = existingKeyData.key;
+                    keyDisplay.style.display = 'block';
+                    
+                    // Start timer
+                    stopTimer = startTimer(existingKeyData.expiresAt);
+                    
+                    // Add key for parsing
+                    addKeyForParsing(existingKeyData.key);
+                }
             }
             
             // Allow Enter key to submit
@@ -422,6 +517,17 @@
                     generateBtn.click();
                 }
             });
+            
+            // Clean up expired keys periodically
+            setInterval(() => {
+                const recentKeys = JSON.parse(localStorage.getItem('recent_keys') || '[]');
+                const now = Date.now();
+                const validKeys = recentKeys.filter(k => k.expiresAt > now);
+                
+                if (validKeys.length !== recentKeys.length) {
+                    localStorage.setItem('recent_keys', JSON.stringify(validKeys));
+                }
+            }, 60000); // Check every minute
         }
         
         // Start when page loads
