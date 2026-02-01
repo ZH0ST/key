@@ -3,535 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Key Generator</title>
+    <title>Key System</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 500px;
-            width: 100%;
-            background: rgba(20, 20, 30, 0.95);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 170, 255, 0.3);
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .header h1 {
-            background: linear-gradient(90deg, #00aaff, #ff00aa);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            color: #aaa;
-            font-size: 1rem;
-        }
-        
-        .input-section {
-            margin-bottom: 25px;
-        }
-        
-        .input-section label {
-            display: block;
-            color: #88ccff;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-        }
-        
-        .input-section input {
-            width: 100%;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(0, 170, 255, 0.5);
-            border-radius: 10px;
-            color: white;
-            font-size: 1.1rem;
-            transition: border-color 0.3s;
-        }
-        
-        .input-section input:focus {
-            outline: none;
-            border-color: #00aaff;
-        }
-        
-        .info-text {
-            background: rgba(0, 50, 100, 0.2);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            color: #ccc;
-            border: 1px solid rgba(0, 170, 255, 0.2);
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #00aaff, #0088cc);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        
-        .btn:hover {
-            background: linear-gradient(135deg, #00bbff, #0099dd);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 170, 255, 0.3);
-        }
-        
-        .btn:active {
-            transform: translateY(0);
-        }
-        
-        .btn:disabled {
-            background: #555;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .key-display {
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 30px;
-            border: 2px solid rgba(0, 255, 170, 0.3);
-            display: none;
-        }
-        
-        .key-label {
-            color: #00ffaa;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            display: block;
-        }
-        
-        .key-value {
-            font-family: 'Courier New', monospace;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: white;
-            word-break: break-all;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            margin-bottom: 15px;
-            text-align: center;
-            border: 1px solid rgba(0, 255, 170, 0.2);
-        }
-        
-        .timer {
-            color: #ffaa00;
-            font-size: 1.3rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        
-        .copy-btn {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0, 200, 100, 0.2);
-            color: #00ffaa;
-            border: 1px solid rgba(0, 255, 170, 0.5);
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .copy-btn:hover {
-            background: rgba(0, 255, 170, 0.3);
-        }
-        
-        .status {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            display: none;
-        }
-        
-        .status.success {
-            background: rgba(0, 255, 0, 0.1);
-            color: #00ff00;
-            border: 1px solid rgba(0, 255, 0, 0.3);
-            display: block;
-        }
-        
-        .status.error {
-            background: rgba(255, 0, 0, 0.1);
-            color: #ff5555;
-            border: 1px solid rgba(255, 0, 0, 0.3);
-            display: block;
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        .key-format {
-            font-size: 0.8rem;
-            color: #888;
-            text-align: center;
-            margin-top: 10px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #0a0a0a; color: white; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .container { max-width: 500px; width: 100%; background: #111; border-radius: 10px; padding: 30px; border: 1px solid #00aaff; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { color: #00aaff; font-size: 28px; margin-bottom: 5px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; color: #88ccff; margin-bottom: 8px; }
+        .input-group input { width: 100%; padding: 12px; background: #222; border: 1px solid #00aaff; border-radius: 5px; color: white; }
+        .btn { width: 100%; padding: 14px; background: #00aaff; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .btn:hover { background: #0088cc; }
+        .key-display { background: #222; padding: 20px; border-radius: 5px; margin-top: 20px; display: none; }
+        .key { font-family: monospace; font-size: 20px; color: #00ffaa; text-align: center; margin: 10px 0; }
+        .timer { color: #ffaa00; text-align: center; margin: 10px 0; }
+        .status { padding: 10px; border-radius: 5px; margin-top: 10px; text-align: center; display: none; }
+        .success { background: rgba(0,255,0,0.1); color: #00ff00; border: 1px solid #00ff00; }
+        .error { background: rgba(255,0,0,0.1); color: #ff5555; border: 1px solid #ff5555; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔐 Roblox Key System</h1>
-            <p>Enter your Roblox User ID to get a unique 10-minute key</p>
+            <h1>🔑 Key Generator</h1>
+            <p>Enter your Roblox User ID for a key</p>
         </div>
         
-        <div class="info-text">
-            <strong>How to find your Roblox User ID:</strong><br>
-            1. Go to your Roblox profile<br>
-            2. The URL will look like: https://www.roblox.com/users/<strong>123456789</strong>/profile<br>
-            3. Copy the number (this is your User ID)
+        <div class="input-group">
+            <label>Roblox User ID:</label>
+            <input type="number" id="userId" placeholder="e.g., 10428355122">
         </div>
         
-        <div class="input-section">
-            <label for="userIdInput">Your Roblox User ID:</label>
-            <input type="number" id="userIdInput" placeholder="Enter your User ID (e.g., 3988214995)" min="1">
-        </div>
-        
-        <button class="btn" id="generateBtn">🔑 Generate My Key</button>
+        <button class="btn" id="generateBtn">Generate Key</button>
         
         <div class="key-display" id="keyDisplay">
-            <span class="key-label">YOUR KEY:</span>
-            <div class="key-value" id="generatedKey">Loading...</div>
-            <div class="timer" id="timer">Expires in: 10:00</div>
-            <div class="key-format">Format: USERID-TIMESTAMP-HASH</div>
-            
-            <button class="copy-btn" id="copyBtn">
-                📋 Copy Key
-            </button>
+            <div class="key" id="keyText">Loading...</div>
+            <div class="timer" id="timer">10:00</div>
+            <button class="btn" onclick="copyKey()">Copy Key</button>
         </div>
         
-        <div class="status" id="statusMessage"></div>
-        
-        <div class="footer">
-            <p>Keys are tied to your User ID and last 10 minutes</p>
-        </div>
+        <div class="status" id="status"></div>
     </div>
 
     <script>
-        // Generate a hash for the key
-        function generateHash(userId, timestamp) {
-            // Simple deterministic hash
+        // Simple key generation (similar to LuaMorg)
+        function generateKey(userId) {
+            const timestamp = Math.floor(Date.now() / 600000); // 10-minute blocks
+            const secret = "ROBLOX_KEY_2024_SECRET";
+            
+            // Simple hash
             let hash = 0;
-            const str = `${userId}-${timestamp}-ROBLOX-KEY-SECRET`;
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
+            for (let i = 0; i < userId.length; i++) {
+                hash = ((hash << 5) - hash) + userId.charCodeAt(i);
                 hash = hash & hash;
             }
-            return Math.abs(hash).toString(16).substring(0, 8).toUpperCase();
+            
+            const keyHash = Math.abs(hash).toString(16).toUpperCase().substring(0, 8);
+            const timeCode = timestamp.toString(36).toUpperCase();
+            
+            return `${userId}-${timeCode}-${keyHash}`;
         }
 
-        // Generate timestamp (10-minute blocks)
-        function getTimestamp() {
-            const now = Date.now();
-            const tenMinuteBlock = Math.floor(now / (10 * 60 * 1000));
-            return tenMinuteBlock.toString(36).toUpperCase();
-        }
-
-        // Generate key for user
-        function generateKey(userId) {
-            const timestamp = getTimestamp();
-            const hash = generateHash(userId, timestamp);
-            return `${userId}-${timestamp}-${hash}`;
-        }
-
-        // Check if a key is still valid
-        function isKeyValid(keyData) {
-            if (!keyData) return false;
-            
-            const now = Date.now();
-            const timeLeft = keyData.expiresAt - now;
-            
-            // Also check if the 10-minute block is still the same
-            const currentTimestamp = getTimestamp();
-            const keyTimestamp = keyData.key.split('-')[1];
-            
-            return timeLeft > 0 && currentTimestamp === keyTimestamp;
-        }
-
-        // Save key to localStorage
-        function saveKeyToStorage(userId, key) {
-            const keyData = {
-                key: key,
-                generatedAt: Date.now(),
-                expiresAt: Date.now() + (10 * 60 * 1000), // 10 minutes
-                userId: userId
-            };
-            
+        // Save key to GitHub Pages style
+        function saveKey(key) {
             // Store in localStorage
-            localStorage.setItem(`roblox_key_${userId}`, JSON.stringify(keyData));
+            localStorage.setItem('current_key', key);
+            localStorage.setItem('key_time', Date.now().toString());
             
-            // Also store recent keys for lookup
-            let recentKeys = JSON.parse(localStorage.getItem('recent_keys') || '[]');
-            recentKeys = recentKeys.filter(k => k.userId !== userId);
-            recentKeys.push(keyData);
-            localStorage.setItem('recent_keys', JSON.stringify(recentKeys.slice(-10))); // Keep last 10
+            // Also update the page meta tag for Roblox to read
+            document.getElementById('keyData').textContent = key;
+            
+            // Update hidden input for form submission (if needed)
+            document.getElementById('hiddenKey').value = key;
         }
 
-        // Get key from storage
-        function getKeyFromStorage(userId) {
-            const keyData = JSON.parse(localStorage.getItem(`roblox_key_${userId}`) || 'null');
-            
-            if (keyData && isKeyValid(keyData)) {
-                return keyData;
-            }
-            
-            return null;
-        }
-
-        // Format time as MM:SS
+        // Format time
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
-            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // Update timer display
-        function startTimer(expiresAt) {
-            const updateTimerDisplay = () => {
-                const now = Date.now();
-                const timeLeft = expiresAt - now;
+        // Start timer
+        function startTimer() {
+            const startTime = parseInt(localStorage.getItem('key_time') || Date.now());
+            const update = () => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = 600 - elapsed; // 10 minutes = 600 seconds
                 
-                if (timeLeft <= 0) {
-                    document.getElementById('timer').textContent = 'EXPIRED - Generate a new key';
-                    document.getElementById('generatedKey').style.color = '#ff5555';
+                if (remaining <= 0) {
+                    document.getElementById('timer').textContent = 'EXPIRED';
+                    document.getElementById('keyText').style.color = '#ff5555';
                     return;
                 }
                 
-                const secondsLeft = Math.floor(timeLeft / 1000);
-                document.getElementById('timer').textContent = `Expires in: ${formatTime(secondsLeft)}`;
+                document.getElementById('timer').textContent = formatTime(remaining);
             };
             
-            updateTimerDisplay();
-            const timerInterval = setInterval(updateTimerDisplay, 1000);
-            
-            // Return function to stop timer
-            return () => clearInterval(timerInterval);
+            update();
+            setInterval(update, 1000);
         }
 
-        // Copy key to clipboard
-        function copyToClipboard() {
-            const key = document.getElementById('generatedKey').textContent;
+        // Copy key
+        function copyKey() {
+            const key = document.getElementById('keyText').textContent;
+            navigator.clipboard.writeText(key).then(() => {
+                showStatus('Key copied!', 'success');
+            });
+        }
+
+        // Show status
+        function showStatus(msg, type) {
+            const status = document.getElementById('status');
+            status.textContent = msg;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            setTimeout(() => status.style.display = 'none', 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('generateBtn');
+            const userIdInput = document.getElementById('userId');
             
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(key).then(() => {
-                    showStatus('✅ Key copied to clipboard!', 'success');
-                }).catch(() => {
-                    copyFallback(key);
-                });
-            } else {
-                copyFallback(key);
+            // Check for existing key
+            const existingKey = localStorage.getItem('current_key');
+            const keyTime = parseInt(localStorage.getItem('key_time'));
+            
+            if (existingKey && keyTime && (Date.now() - keyTime < 600000)) {
+                // Show existing valid key
+                document.getElementById('keyText').textContent = existingKey;
+                document.getElementById('keyDisplay').style.display = 'block';
+                startTimer();
+                userIdInput.value = existingKey.split('-')[0];
             }
-        }
-
-        // Fallback copy method
-        function copyFallback(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            document.body.appendChild(textArea);
-            textArea.select();
             
-            try {
-                document.execCommand('copy');
-                showStatus('✅ Key copied to clipboard!', 'success');
-            } catch (err) {
-                showStatus('❌ Failed to copy. Please select and copy manually.', 'error');
-            }
-            
-            document.body.removeChild(textArea);
-        }
-
-        // Show status message
-        function showStatus(message, type) {
-            const statusEl = document.getElementById('statusMessage');
-            statusEl.textContent = message;
-            statusEl.className = `status ${type}`;
-            
-            setTimeout(() => {
-                statusEl.className = 'status';
-            }, 3000);
-        }
-
-        // Add key to HTML for Roblox script to parse
-        function addKeyForParsing(key) {
-            // Remove any existing key elements
-            const oldMeta = document.querySelector('meta[name="generated-key"]');
-            if (oldMeta) oldMeta.remove();
-            
-            const oldDiv = document.getElementById('key-plain-text');
-            if (oldDiv) oldDiv.remove();
-            
-            // Add meta tag
-            const metaTag = document.createElement('meta');
-            metaTag.name = 'generated-key';
-            metaTag.content = key;
-            document.head.appendChild(metaTag);
-            
-            // Add hidden div with JUST the key (no spaces, no formatting)
-            const plainDiv = document.createElement('div');
-            plainDiv.id = 'key-plain-text';
-            plainDiv.style.display = 'none';
-            plainDiv.textContent = key;
-            document.body.appendChild(plainDiv);
-            
-            console.log('Key added for Roblox parsing:', key);
-        }
-
-        // Initialize the page
-        function init() {
-            const generateBtn = document.getElementById('generateBtn');
-            const userIdInput = document.getElementById('userIdInput');
-            const copyBtn = document.getElementById('copyBtn');
-            const keyDisplay = document.getElementById('keyDisplay');
-            let stopTimer = null;
-            
-            // Generate button click
-            generateBtn.addEventListener('click', async () => {
+            // Generate new key
+            btn.addEventListener('click', () => {
                 const userId = userIdInput.value.trim();
-                
-                if (!userId || isNaN(userId) || userId < 1) {
-                    showStatus('❌ Please enter a valid Roblox User ID', 'error');
+                if (!userId) {
+                    showStatus('Enter User ID', 'error');
                     return;
                 }
                 
-                // Disable button and show loading
-                generateBtn.disabled = true;
-                generateBtn.textContent = '🔄 Generating...';
+                const key = generateKey(userId);
+                document.getElementById('keyText').textContent = key;
+                document.getElementById('keyDisplay').style.display = 'block';
                 
-                try {
-                    // Check if user already has a valid key
-                    const existingKeyData = getKeyFromStorage(userId);
-                    
-                    let keyData;
-                    if (existingKeyData) {
-                        // Use existing valid key
-                        keyData = existingKeyData;
-                        showStatus('✅ Using existing valid key', 'success');
-                    } else {
-                        // Generate new key
-                        const key = generateKey(userId);
-                        keyData = {
-                            key: key,
-                            generatedAt: Date.now(),
-                            expiresAt: Date.now() + (10 * 60 * 1000),
-                            userId: userId
-                        };
-                        
-                        // Save to storage
-                        saveKeyToStorage(userId, key);
-                        showStatus('✅ New key generated successfully!', 'success');
-                    }
-                    
-                    // Display the key
-                    document.getElementById('generatedKey').textContent = keyData.key;
-                    keyDisplay.style.display = 'block';
-                    
-                    // Clear any existing timer
-                    if (stopTimer) stopTimer();
-                    
-                    // Start the timer
-                    stopTimer = startTimer(keyData.expiresAt);
-                    
-                    // Store user ID in localStorage for convenience
-                    localStorage.setItem('roblox_userid', userId);
-                    
-                    // Add key for Roblox script parsing
-                    addKeyForParsing(keyData.key);
-                    
-                } catch (error) {
-                    console.error('Error:', error);
-                    showStatus('❌ Failed to generate key. Please try again.', 'error');
-                } finally {
-                    generateBtn.disabled = false;
-                    generateBtn.textContent = '🔑 Generate My Key';
-                }
+                saveKey(key);
+                startTimer();
+                showStatus('Key generated!', 'success');
             });
             
-            // Copy button click
-            copyBtn.addEventListener('click', copyToClipboard);
-            
-            // Auto-fill user ID from localStorage if exists
-            const savedUserId = localStorage.getItem('roblox_userid');
-            if (savedUserId) {
-                userIdInput.value = savedUserId;
-                
-                // Auto-load existing key if available
-                const existingKeyData = getKeyFromStorage(savedUserId);
-                if (existingKeyData) {
-                    document.getElementById('generatedKey').textContent = existingKeyData.key;
-                    keyDisplay.style.display = 'block';
-                    
-                    // Start timer
-                    stopTimer = startTimer(existingKeyData.expiresAt);
-                    
-                    // Add key for parsing
-                    addKeyForParsing(existingKeyData.key);
-                }
-            }
-            
-            // Allow Enter key to submit
+            // Allow Enter key
             userIdInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    generateBtn.click();
-                }
+                if (e.key === 'Enter') btn.click();
             });
-            
-            // Clean up expired keys periodically
-            setInterval(() => {
-                const recentKeys = JSON.parse(localStorage.getItem('recent_keys') || '[]');
-                const now = Date.now();
-                const validKeys = recentKeys.filter(k => k.expiresAt > now);
-                
-                if (validKeys.length !== recentKeys.length) {
-                    localStorage.setItem('recent_keys', JSON.stringify(validKeys));
-                }
-            }, 60000); // Check every minute
-        }
-        
-        // Start when page loads
-        document.addEventListener('DOMContentLoaded', init);
+        });
     </script>
+    
+    <!-- Hidden elements for Roblox to read -->
+    <div id="keyData" style="display: none;"></div>
+    <input type="hidden" id="hiddenKey" value="">
+    
+    <!-- Meta tags for easy parsing -->
+    <meta name="key-data" content="" id="metaKey">
 </body>
 </html>
