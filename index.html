@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Random Code Generator</title>
+  <style>
+    body {
+      font-family: monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #0f0f0f;
+      color: #00ff99;
+      font-size: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="code">----------</div>
+
+  <script>
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const codeLength = 10;
+    const updateInterval = 10 * 60 * 1000; // 10 minutes
+
+    function generateCode() {
+      let result = "";
+      for (let i = 0; i < codeLength; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      document.getElementById("code").textContent = result;
+    }
+
+    // Generate immediately on load
+    generateCode();
+
+    // Update every 10 minutes
+    setInterval(generateCode, updateInterval);
+  </script>
+
+</body>
+</html>
