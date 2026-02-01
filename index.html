@@ -5,169 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Key System</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #0a0a0a; color: white; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .container { max-width: 500px; width: 100%; background: #111; border-radius: 10px; padding: 30px; border: 1px solid #00aaff; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { color: #00aaff; font-size: 28px; margin-bottom: 5px; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; color: #88ccff; margin-bottom: 8px; }
-        .input-group input { width: 100%; padding: 12px; background: #222; border: 1px solid #00aaff; border-radius: 5px; color: white; }
-        .btn { width: 100%; padding: 14px; background: #00aaff; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
-        .btn:hover { background: #0088cc; }
-        .key-display { background: #222; padding: 20px; border-radius: 5px; margin-top: 20px; display: none; }
-        .key { font-family: monospace; font-size: 20px; color: #00ffaa; text-align: center; margin: 10px 0; }
-        .timer { color: #ffaa00; text-align: center; margin: 10px 0; }
-        .status { padding: 10px; border-radius: 5px; margin-top: 10px; text-align: center; display: none; }
-        .success { background: rgba(0,255,0,0.1); color: #00ff00; border: 1px solid #00ff00; }
-        .error { background: rgba(255,0,0,0.1); color: #ff5555; border: 1px solid #ff5555; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #111; color: white; font-family: Arial; padding: 20px; }
+        .container { max-width: 400px; margin: 50px auto; background: #222; padding: 20px; border-radius: 10px; }
+        h1 { color: #00aaff; text-align: center; margin-bottom: 20px; }
+        input, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        input { background: #333; border: 1px solid #00aaff; color: white; }
+        button { background: #00aaff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0088cc; }
+        #key { background: #000; padding: 15px; border-radius: 5px; margin: 20px 0; font-family: monospace; text-align: center; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🔑 Key Generator</h1>
-            <p>Enter your Roblox User ID for a key</p>
+        <h1>🔑 Key Generator</h1>
+        <input type="number" id="userId" placeholder="Roblox User ID">
+        <button onclick="generateKey()">Generate Key</button>
+        
+        <div id="keyDisplay" class="hidden">
+            <div id="key">Loading...</div>
+            <button onclick="copyKey()">Copy Key</button>
         </div>
         
-        <div class="input-group">
-            <label>Roblox User ID:</label>
-            <input type="number" id="userId" placeholder="e.g., 10428355122">
-        </div>
-        
-        <button class="btn" id="generateBtn">Generate Key</button>
-        
-        <div class="key-display" id="keyDisplay">
-            <div class="key" id="keyText">Loading...</div>
-            <div class="timer" id="timer">10:00</div>
-            <button class="btn" onclick="copyKey()">Copy Key</button>
-        </div>
-        
-        <div class="status" id="status"></div>
+        <div id="status"></div>
     </div>
 
     <script>
-        // Simple key generation (similar to LuaMorg)
-        function generateKey(userId) {
-            const timestamp = Math.floor(Date.now() / 600000); // 10-minute blocks
-            const secret = "ROBLOX_KEY_2024_SECRET";
+        // Generate key
+        function generateKey() {
+            const userId = document.getElementById('userId').value;
+            if (!userId) return alert('Enter User ID');
             
-            // Simple hash
-            let hash = 0;
-            for (let i = 0; i < userId.length; i++) {
-                hash = ((hash << 5) - hash) + userId.charCodeAt(i);
-                hash = hash & hash;
-            }
+            const timestamp = Math.floor(Date.now() / 600000).toString(36).toUpperCase();
+            const hash = Math.abs(parseInt(userId) * 123456789).toString(16).toUpperCase().substr(0, 8);
+            const key = `${userId}-${timestamp}-${hash}`;
             
-            const keyHash = Math.abs(hash).toString(16).toUpperCase().substring(0, 8);
-            const timeCode = timestamp.toString(36).toUpperCase();
+            document.getElementById('key').textContent = key;
+            document.getElementById('keyDisplay').classList.remove('hidden');
             
-            return `${userId}-${timeCode}-${keyHash}`;
+            // Update GitHub file via GitHub API (simplified)
+            updateKeyFile(key);
+            
+            // Show success
+            showStatus('Key generated! Valid for 10 minutes.', 'green');
         }
-
-        // Save key to GitHub Pages style
-        function saveKey(key) {
-            // Store in localStorage
-            localStorage.setItem('current_key', key);
-            localStorage.setItem('key_time', Date.now().toString());
-            
-            // Also update the page meta tag for Roblox to read
-            document.getElementById('keyData').textContent = key;
-            
-            // Update hidden input for form submission (if needed)
-            document.getElementById('hiddenKey').value = key;
-        }
-
-        // Format time
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        // Start timer
-        function startTimer() {
-            const startTime = parseInt(localStorage.getItem('key_time') || Date.now());
-            const update = () => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const remaining = 600 - elapsed; // 10 minutes = 600 seconds
-                
-                if (remaining <= 0) {
-                    document.getElementById('timer').textContent = 'EXPIRED';
-                    document.getElementById('keyText').style.color = '#ff5555';
-                    return;
-                }
-                
-                document.getElementById('timer').textContent = formatTime(remaining);
-            };
-            
-            update();
-            setInterval(update, 1000);
-        }
-
-        // Copy key
+        
         function copyKey() {
-            const key = document.getElementById('keyText').textContent;
-            navigator.clipboard.writeText(key).then(() => {
-                showStatus('Key copied!', 'success');
-            });
+            navigator.clipboard.writeText(document.getElementById('key').textContent);
+            showStatus('Copied!', 'blue');
         }
-
-        // Show status
-        function showStatus(msg, type) {
+        
+        function showStatus(msg, color) {
             const status = document.getElementById('status');
             status.textContent = msg;
-            status.className = `status ${type}`;
-            status.style.display = 'block';
-            setTimeout(() => status.style.display = 'none', 3000);
+            status.style.color = color;
+            setTimeout(() => status.textContent = '', 3000);
         }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('generateBtn');
-            const userIdInput = document.getElementById('userId');
-            
-            // Check for existing key
-            const existingKey = localStorage.getItem('current_key');
-            const keyTime = parseInt(localStorage.getItem('key_time'));
-            
-            if (existingKey && keyTime && (Date.now() - keyTime < 600000)) {
-                // Show existing valid key
-                document.getElementById('keyText').textContent = existingKey;
-                document.getElementById('keyDisplay').style.display = 'block';
-                startTimer();
-                userIdInput.value = existingKey.split('-')[0];
+        
+        // For parsing by Roblox script
+        function updateMetaTag(key) {
+            let meta = document.querySelector('meta[name="key"]');
+            if (!meta) {
+                meta = document.createElement('meta');
+                meta.name = 'key';
+                document.head.appendChild(meta);
             }
-            
-            // Generate new key
-            btn.addEventListener('click', () => {
-                const userId = userIdInput.value.trim();
-                if (!userId) {
-                    showStatus('Enter User ID', 'error');
-                    return;
-                }
-                
-                const key = generateKey(userId);
-                document.getElementById('keyText').textContent = key;
-                document.getElementById('keyDisplay').style.display = 'block';
-                
-                saveKey(key);
-                startTimer();
-                showStatus('Key generated!', 'success');
-            });
-            
-            // Allow Enter key
-            userIdInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') btn.click();
-            });
-        });
+            meta.content = key;
+        }
+        
+        // Call this after generating key
+        updateMetaTag('CURRENT_KEY_HERE');
     </script>
     
-    <!-- Hidden elements for Roblox to read -->
-    <div id="keyData" style="display: none;"></div>
-    <input type="hidden" id="hiddenKey" value="">
-    
-    <!-- Meta tags for easy parsing -->
-    <meta name="key-data" content="" id="metaKey">
+    <!-- Key will appear here for Roblox to read -->
+    <div id="robloxKey" style="display: none;"></div>
 </body>
 </html>
